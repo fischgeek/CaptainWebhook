@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "registerwebhook";
+}
+
+    <div id="root">
+        <div class="row" data-bind="with: NewHook">
+            <div class="col-md-12 col-lg-5 bottomspace-medium">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Register a New Webhook</h3>
+                        <div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <input type="text" id="description" class="form-control w-100" name="description" autocomplete="off" data-bind="textInput: description" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="callbackURL">Callback URL:</label>
+                                <input type="text" id="callbackURL" class="form-control" name="callbackURL" autocomplete="off" data-bind="textInput: callbackURL" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="idModel">ID of the Model:</label>
+                                <div class="input-group">
+                                    <input type="text" id="idModel" class="form-control" name="idModel" autocomplete="off" data-bind="textInput: idModel" aria-describedby="basic-addon2" />
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary" type="button" data-bind="click: $root.AskTrello"><i class="material-icons vab">search</i></button>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <span data-bind="text: $root.SelectedInfo"></span>
+                                </div>
+                            </div>
+
+                            <button id="submit" class="btn btn-primary" data-bind="click: $root.CreateHook">
+                                <span class="spinner"></span>
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-7">
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <pre class="text-white" data-bind="text: $root.FormattedPostData"></pre>
+                    </div>
+                </div>
+                <div data-bind="if: $root.CreateHookResponse">
+                    <div class="card bg-dark topspace-medium">
+                        <div class="card-body">
+                            <pre class="text-white" data-bind="text: $root.CreateHookResponse"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ko foreach: Hooks -->
+        <div class="row" style="margin-top: 25px">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <pre data-bind="text: $root.FormatHookAsJSON($data)"></pre>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-outline-danger float-right" data-bind="click: $root.DeleteHook">
+                                <span class="spinner"></span>
+                                Delete
+                            </button>
+                            <button type="button" class="btn btn-outline-info" data-bind="click: $root.TestURL">
+                                <span class="spinner"></span>
+                                Test Callback URL
+                            </button>
+                            <div class="btn callback-test-status d-inline-block" style="color: #f7f7f7">
+                                <i class="material-icons md-48 vab">check_circle_outline</i>
+                                <span class="status-message">URL is unreachable!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- /ko -->
+
+        <div class="modal" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h4 class="modal-title">Trello Models</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="all-boards">Select a Board:</label>
+                            <select class="form-control" id="all-boards" data-bind="options: AllBoards, value: SelectedBoard, optionsText: 'name'"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="board-lists">Select a List:</label>
+                            <select class="form-control" id="board-lists" data-bind="options: AllListsOnBoard, value: SelectedList, optionsText: 'name', optionsCaption: '-- Select a List --'"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="list-cards">Select a Card:</label>
+                            <select class="form-control" id="list-cards" data-bind="options: AllCardsOnList, value: SelectedCard, optionsText: 'name', optionsCaption: '-- Select a Card --'"></select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+@section scripts {
+    <script>
+        window.Model=@Html.Raw(Model);
+    </script>
+    <script src="~/views/trello/managewebhooks.js"></script>
+}
