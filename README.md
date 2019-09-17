@@ -1,11 +1,11 @@
 # CaptainWebhook
 
 ## Requires
-*Shared Library*
+**Shared Library**
 https://github.com/fischgeek/SharedLibrary
 
-*TrelloUtility*
+**TrelloUtility**
 https://github.com/fischgeek/TrelloUtility
 
-*TheMovieDBClassLibrary*
+**TheMovieDBClassLibrary**
 https://github.com/fischgeek/TheMovieDBClassLibrary
