@@ -14,6 +14,7 @@ Views/*/*.js
 Views/*/*.js.map
 Scripts/*.js.map
 Scripts/*/*.js.map
+Scripts/Models/*.js
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
