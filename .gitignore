@@ -12,6 +12,7 @@ appsettings.config
 hooks.json
 Views/*/*.js
 Views/*/*.js.map
+Scripts/*.js.map
 Scripts/*/*.js.map
 
 # User-specific files (MonoDevelop/Xamarin Studio)
