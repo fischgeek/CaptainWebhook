@@ -41,7 +41,7 @@ namespace CaptainWebhook.Controllers
             return View(model: JsonConvert.SerializeObject(x, Formatting.Indented));
         }
 
-        public ActionResult fischflicks()
+        public ActionResult ParseWebhook()
         {
             Stream req = Request.InputStream;
             req.Seek(0, System.IO.SeekOrigin.Begin);
@@ -60,18 +60,29 @@ namespace CaptainWebhook.Controllers
 
         public void ProcessWebhook(Hook hook)
         {
-            if (hook.model.name == "FischFlicks") {
-                if (hook.action.type == "createCard") {
-                    var tb = FireUpTrello();
-                    var mb = FireUpMovieDB();
-                    var targetCard = hook.action.data.card;
-                    var title = mb.GetMovieTitle(targetCard.name);
-                    var desc = mb.GetMovieDescription(targetCard.name);
-                    var posterUrl = mb.GetMoviePosterUrl(targetCard.name);
-                    tb.UpdateCardName(targetCard.id, title);
-                    tb.UpdateCardDescription(targetCard.id, desc);
-                    tb.AddAttachment(targetCard.id, posterUrl);
-                }
+            switch (hook.model.name) {
+                case "FischFlicks":
+                    if (hook.action.type == HookAction.createCard.ToString()) {
+                        var tb = FireUpTrello();
+                        var mb = FireUpMovieDB();
+                        var targetCard = hook.action.data.card;
+                        var title = mb.GetMovieTitle(targetCard.name);
+                        var desc = mb.GetMovieDescription(targetCard.name);
+                        var posterUrl = mb.GetMoviePosterUrl(targetCard.name);
+                        tb.UpdateCardName(targetCard.id, title);
+                        tb.UpdateCardDescription(targetCard.id, desc);
+                        tb.AddAttachment(targetCard.id, posterUrl);
+                    }
+                    break;
+                case "Legos":
+                    if (hook.action.type == HookAction.createCard.ToString()) {
+                        var legoUrl = "https://www.lego.com/biassets/bi/";
+                        var bricksetExportUrl = "https://brickset.com/exportscripts/instructions";
+                        var res = WebCall.GetRequest(bricksetExportUrl);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -117,5 +128,10 @@ namespace CaptainWebhook.Controllers
     {
         public string Status { get; set; }
         public string Msg { get; set; }
+    }
+
+    public enum HookAction
+    {
+        createCard
     }
 }
