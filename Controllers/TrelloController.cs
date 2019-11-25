@@ -55,7 +55,6 @@ namespace CaptainWebhook.Controllers
                 var hook = JsonConvert.DeserializeObject<Hook>(json);
                 returnString = JsonConvert.SerializeObject(hook, Formatting.Indented);
                 System.IO.File.WriteAllText($@"{Server.MapPath($"~/hooks/{stamp}.json")}", returnString);
-                Log(hook.action.type);
                 ProcessWebhook(hook);
                 if (hook.action.type == "createCard") {
                     returnString = JsonConvert.SerializeObject(hook, Formatting.Indented);
@@ -67,59 +66,9 @@ namespace CaptainWebhook.Controllers
 
         public void ProcessWebhook(Hook hook)
         {
-            Log(hook.action.type);
             var tb = FireUpTrello();
             switch (hook.model.name) {
-                case "FischFlicks":
-                    if (hook.action.type == HookAction.createCard.ToString()) {
-                        var mb = FireUpMovieDB();
-                        var targetCard = hook.action.data.card;
-                        var title = mb.GetMovieTitle(targetCard.name);
-                        var desc = mb.GetMovieDescription(targetCard.name);
-                        var posterUrl = mb.GetMoviePosterUrl(targetCard.name);
-                        tb.UpdateCardName(targetCard.id, title);
-                        tb.UpdateCardDescription(targetCard.id, desc);
-                        tb.AddAttachment(targetCard.id, posterUrl);
-                    }
-                    break;
-                case "Legos":
-                    if (hook.action.type == HookAction.createCard.ToString()) {
-                        var legoUrl = "https://www.lego.com/biassets/bi/";
-                        var bricksetExportUrl = "https://brickset.com/exportscripts/instructions";
-                        var res = WebCall.GetRequest(bricksetExportUrl);
-                        var pdf = string.Empty;
-                        var match = Regex.Match(res, $@"({hook.action.data.card.name}-1)(.*bi\/)(.*.pdf)");
-                        if (match.Success) {
-                            pdf = match.Groups[3].Value;
-                        }
-                        if (!string.IsNullOrEmpty(pdf)) {
-                            legoUrl = legoUrl + pdf;
-                            tb.AddAttachment(hook.action.data.card.id, legoUrl);
-                            var proc = System.Diagnostics.Process.Start("cmd.exe", "magick identify --version >> magick.txt");
-                            proc.Close();
-                        }
-                    }
-                    break;
-                case "Current Projects":
-                    if (hook.action.type == HookAction.createCard.ToString()) {
-                        var listName = hook.action.data.list.name;
-                        if (listName.JFIsNotNull() && listName == "Current Projects") {
-                            AddChecklistToCard(hook.action.data.card.id);
-                        }
-                    }
-                    break;
-                case "fischgeek":
-                    if (hook.action.type == HookAction.createCheckItem.ToString()) {
-
-                    }
-                    break;
-                case "Receipts":
-                    if (hook.action.type == HookAction.addAttachmentToCard.ToString()) {
-                        Log(hook.action.type);
-                        Log("Removing attachment cover.");
-                        tb.RemoveCoverImage(hook.action.data.card.id);
-                    }
-                    break;
+                // add your customization here for the model you registered
                 default:
                     break;
             }
