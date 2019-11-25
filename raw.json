@@ -1,0 +1,52 @@
+{
+  "model": {
+    "id": "5d4c873b0fa0d273b684f3c3",
+    "name": "Current Projects"
+  },
+  "action": {
+    "id": "5db8c2fed4a7426ddb5c506e",
+    "idMemberCreator": "5964da335363d9a3b416caee",
+    "data": {
+      "card": {
+        "id": "5db8c2fed4a7426ddb5c506d",
+        "name": "Test Project",
+        "desc": null,
+        "badges": null,
+        "closed": false,
+        "dateLastActivity": null,
+        "due": null,
+        "dueComplete": false,
+        "idAttachmentCover": null,
+        "idBoard": null,
+        "idChecklists": null,
+        "idLabels": null,
+        "idMembers": null,
+        "idShort": "552",
+        "labels": null,
+        "pos": 0.0,
+        "shortLink": "11wbnCA6",
+        "shortUrl": null,
+        "subscribed": false,
+        "url": null,
+        "address": null,
+        "locationName": null,
+        "coordinates": null
+      },
+      "board": {
+        "apiKey": null,
+        "apiToken": null
+      },
+      "list": {
+        "id": "5d4c873b0fa0d273b684f3c3",
+        "name": "Current Projects",
+        "closed": false,
+        "idBoard": null,
+        "pos": 0.0,
+        "subscribed": false,
+        "cards": null
+      }
+    },
+    "type": "createCard",
+    "date": "2019-10-29T22:53:50.098Z"
+  }
+}
