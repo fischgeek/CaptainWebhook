@@ -259,6 +259,7 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="appsettings.config" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -314,7 +315,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Trello\index.cshtml" />
-    <Content Include="Views\Trello\fischflicks.cshtml" />
+    <Content Include="Views\Trello\parsewebhook.cshtml" />
     <Content Include="Views\Trello\managewebhooks.cshtml" />
     <Content Include="tsconfig.json" />
     <Content Include="Scripts\umd\popper.min.js.map" />
@@ -343,9 +344,9 @@
       <Project>{eb7de94b-f2f7-4d79-8a2d-2ce239803459}</Project>
       <Name>TheMovieDBClassLibrary</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TrelloUtility\TrelloUtility.csproj">
+    <ProjectReference Include="..\TrelloConnect\TrelloConnect.csproj">
       <Project>{ce193d00-27b5-4642-ade8-7a4beda7cd8d}</Project>
-      <Name>TrelloUtility</Name>
+      <Name>TrelloConnect</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

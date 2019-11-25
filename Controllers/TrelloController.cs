@@ -6,8 +6,10 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using TrelloUtility;
+using TrelloConnect;
 using TheMovieDBClassLibrary;
+using System.Text.RegularExpressions;
+using System;
 
 namespace CaptainWebhook.Controllers
 {
@@ -46,13 +48,18 @@ namespace CaptainWebhook.Controllers
             Stream req = Request.InputStream;
             req.Seek(0, System.IO.SeekOrigin.Begin);
             string json = new StreamReader(req).ReadToEnd();
-            var returnString = string.Empty;
+            var returnString = "nothing to see here. carry on.";
+            var stamp = DateTime.Now.Ticks.ToString();
+            System.IO.File.WriteAllText($@"{Server.MapPath($"~/raw/{stamp}.json")}", json);
             if (!string.IsNullOrEmpty(json)) {
                 var hook = JsonConvert.DeserializeObject<Hook>(json);
+                returnString = JsonConvert.SerializeObject(hook, Formatting.Indented);
+                System.IO.File.WriteAllText($@"{Server.MapPath($"~/hooks/{stamp}.json")}", returnString);
+                Log(hook.action.type);
                 ProcessWebhook(hook);
                 if (hook.action.type == "createCard") {
                     returnString = JsonConvert.SerializeObject(hook, Formatting.Indented);
-                    System.IO.File.WriteAllText($@"{Server.MapPath("~/hooks.json")}", returnString);
+                    System.IO.File.WriteAllText($@"{Server.MapPath("~/createCard.json")}", returnString);
                 }
             }
             return View(model: returnString);
@@ -60,10 +67,11 @@ namespace CaptainWebhook.Controllers
 
         public void ProcessWebhook(Hook hook)
         {
+            Log(hook.action.type);
+            var tb = FireUpTrello();
             switch (hook.model.name) {
                 case "FischFlicks":
                     if (hook.action.type == HookAction.createCard.ToString()) {
-                        var tb = FireUpTrello();
                         var mb = FireUpMovieDB();
                         var targetCard = hook.action.data.card;
                         var title = mb.GetMovieTitle(targetCard.name);
@@ -79,12 +87,45 @@ namespace CaptainWebhook.Controllers
                         var legoUrl = "https://www.lego.com/biassets/bi/";
                         var bricksetExportUrl = "https://brickset.com/exportscripts/instructions";
                         var res = WebCall.GetRequest(bricksetExportUrl);
+                        var pdf = string.Empty;
+                        var match = Regex.Match(res, $@"({hook.action.data.card.name}-1)(.*bi\/)(.*.pdf)");
+                        if (match.Success) {
+                            pdf = match.Groups[3].Value;
+                        }
+                        if (!string.IsNullOrEmpty(pdf)) {
+                            legoUrl = legoUrl + pdf;
+                            tb.AddAttachment(hook.action.data.card.id, legoUrl);
+                            var proc = System.Diagnostics.Process.Start("cmd.exe", "magick identify --version >> magick.txt");
+                            proc.Close();
+                        }
+                    }
+                    break;
+                case "Current Projects":
+                    if (hook.action.type == HookAction.createCard.ToString()) {
+                        var listName = hook.action.data.list.name;
+                        if (listName.JFIsNotNull() && listName == "Current Projects") {
+                            AddChecklistToCard(hook.action.data.card.id);
+                        }
+                    }
+                    break;
+                case "fischgeek":
+                    if (hook.action.type == HookAction.createCheckItem.ToString()) {
+
+                    }
+                    break;
+                case "Receipts":
+                    if (hook.action.type == HookAction.addAttachmentToCard.ToString()) {
+                        Log(hook.action.type);
+                        Log("Removing attachment cover.");
+                        tb.RemoveCoverImage(hook.action.data.card.id);
                     }
                     break;
                 default:
                     break;
             }
         }
+
+        public void Log(string msg) => System.IO.File.AppendAllText(Server.MapPath("~/log/log.txt"), $"[{DateTime.Now.ToShortDateString()}_{DateTime.Now.ToShortTimeString()}] {msg}\n");
 
         public ActionResult URLIsValid(string url) => JsonAllowed(WebCall.URLIsValid(url));
 
@@ -102,6 +143,13 @@ namespace CaptainWebhook.Controllers
         public ActionResult GetLists(string boardId) => JsonAllowed(FireUpTrello().GetLists(boardId).Data);
 
         public ActionResult GetCards(string listId) => JsonAllowed(FireUpTrello().GetCards(listId).Data);
+
+        public ActionResult AddChecklistToCard(string cardId)
+        {
+            var url = $"{TrelloBaseURL}/cards/{cardId}/checklists?key={key}&token={token}";
+            var res = WebCall.PostRequest(url, new { name = "Next Actions" });
+            return JsonAllowed(res);
+        }
 
         private TrelloBase FireUpTrello()
         {
@@ -132,6 +180,8 @@ namespace CaptainWebhook.Controllers
 
     public enum HookAction
     {
-        createCard
+        createCard,
+        createCheckItem,
+        addAttachmentToCard
     }
 }
